@@ -52,6 +52,34 @@
                 
                 @media (max-width: 600px) { body { padding: 10px; } header h1 { font-size: 1.3em; } .progress-bar-container { margin: 30px 0; flex-wrap: wrap; justify-content: center; gap: 10px; } .progress-bar-container::before { display: none; } .step { flex-basis: 30%; margin-bottom: 15px; } .card-grid { grid-template-columns: 1fr; } .scroll-hint { display: block; } }
             </style>
+            <script>
+                var cleanUrl = window.location.href.split('?')[0];
+                
+                // 1. Forzar recarga al abrir desde un link viejo o historial
+                if (!sessionStorage.getItem("fresh_load")) {
+                    sessionStorage.setItem("fresh_load", "true");
+                    window.location.replace(cleanUrl + "?t=" + new Date().getTime());
+                } else {
+                    sessionStorage.removeItem("fresh_load");
+                }
+
+                // 2. Forzar recarga si el navegador restaura la pestaña (botón Atrás)
+                window.addEventListener("pageshow", function(event) {
+                    if (event.persisted) {
+                        window.location.replace(cleanUrl + "?t=" + new Date().getTime());
+                    }
+                });
+
+                // 3. Forzar recarga si la pestaña quedó abierta minimizada más de 3 minutos
+                var loadTime = new Date().getTime();
+                document.addEventListener("visibilitychange", function() {
+                    if (document.visibilityState === 'visible') {
+                        if (new Date().getTime() - loadTime > 180000) { // 180000 ms = 3 minutos
+                            window.location.replace(cleanUrl + "?t=" + new Date().getTime());
+                        }
+                    }
+                });
+        </script>        
         </head>
         <body>
             <div class="container">
@@ -143,11 +171,32 @@ revisar cubiertas</p>
                     <td class="text-right">$0.00</td>
                     <td class="text-right">$0.00</td>
                 </tr>
+                
+                <tr>
+                    <td>wedfdsf</td>
+                    <td class="text-right">1.0</td>
+                    <td class="text-right">$44,354,354.00</td>
+                    <td class="text-right">$44,354,354.00</td>
+                </tr>
+                
+                <tr>
+                    <td>gdfsjhgjhgjghhjghjgh</td>
+                    <td class="text-right">1.0</td>
+                    <td class="text-right">$435,435.80</td>
+                    <td class="text-right">$435,435.80</td>
+                </tr>
+                
+                <tr>
+                    <td>ert5etrt</td>
+                    <td class="text-right">1.0</td>
+                    <td class="text-right">$244.00</td>
+                    <td class="text-right">$244.00</td>
+                </tr>
                 </tbody>
                                 <tfoot>
-                                    <tr class="subtotal-row"><td colspan="3" class="text-right">TOTAL REPARACIÓN</td><td class="text-right">$52,000.00</td></tr>
+                                    <tr class="subtotal-row"><td colspan="3" class="text-right">TOTAL REPARACIÓN</td><td class="text-right">$44,842,033.80</td></tr>
                                     <tr class="pago-row"><td colspan="3" class="text-right">SEÑAS / PAGOS</td><td class="text-right">-$0.00</td></tr>
-                                    <tr class="total-row"><td colspan="3" class="text-right">SALDO A PAGAR</td><td class="text-right">$52,000.00</td></tr>
+                                    <tr class="total-row"><td colspan="3" class="text-right">SALDO A PAGAR</td><td class="text-right">$44,842,033.80</td></tr>
                                 </tfoot>
                             </table>
                         </div>
