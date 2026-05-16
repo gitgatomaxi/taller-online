@@ -18,7 +18,7 @@
                     --text-color: #f0f0f0; --text-color-secondary: #a0a0a0; --primary-color: #007acc;
                     --green-color: #37cc1d; --red-color: #dc3545;
                 }
-                body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 15px; line-height: 1.6; font-weight: 300; }
+                body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 15px; line-height: 1.6; font-weight: 300; overflow-x: hidden; }
                 .container { max-width: 900px; margin: 0 auto; }
                 header { text-align: center; margin-bottom: 30px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px; }
                 header h1 { margin: 0; font-size: 1.5em; color: var(--text-color); font-weight: 700; }
@@ -35,9 +35,9 @@
                 .card { background-color: var(--card-bg-color); padding: 20px; border-radius: 10px; border: 1px solid var(--border-color); box-shadow: 0 2px 8px rgba(0,0,0,0.25); }
                 .card h2 { margin-top: 0; color: var(--primary-color); border-bottom: 1px solid var(--border-color); padding-bottom: 10px; font-size: 1.2em; font-weight: 700; }
                 
-                /* Estilos de la tabla */
+                /* Estilos de la tabla - Aumentado el min-width para forzar el scroll en móviles */
                 .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; position: relative; }
-                .budget-table { width: 100%; min-width: 400px; border-collapse: collapse; margin-top: 10px; }
+                .budget-table { width: 100%; min-width: 500px; border-collapse: collapse; margin-top: 10px; }
                 .budget-table th, .budget-table td { padding: 10px 12px; border-bottom: 1px solid var(--border-color); text-align: left; font-size: 0.95em; }
                 .budget-table th { background-color: #333333; font-weight: 700; }
                 .subtotal-row td { padding-top: 15px; font-weight: bold; }
@@ -45,20 +45,19 @@
                 .total-row td { font-size: 1.2em; font-weight: bold; border-top: 2px solid var(--green-color); padding-top: 15px; color: var(--green-color); }
                 .text-right { text-align: right; }
                 
-                /* NUEVO: ESTILOS DE LA ANIMACIÓN FANTASMA REFORMADA */
+                /* ANIMACIÓN FANTASMA */
                 .table-wrapper { position: relative; }
                 .ghost-hand-container {
                     position: absolute;
-                    top: 50%; /* Centrada verticalmente sobre la tabla */
-                    right: 20px; /* Posición inicial a la derecha */
-                    transform: translateY(-50%); /* Corrección de centrado vertical */
+                    top: 50%;
+                    right: 20px; 
+                    transform: translateY(-50%); 
                     z-index: 20;
-                    display: flex;
+                    display: none; /* Controlado por JS después de que cargue la página */
                     flex-direction: column;
                     align-items: center;
-                    pointer-events: none; /* Los toques traspasan la mano */
-                    transition: opacity 0.6s ease, transform 0.6s ease, filter 0.6s ease;
-                    display: none; /* Controlado por JS */
+                    pointer-events: none; /* La magia: no bloquea los toques */
+                    transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.6s ease;
                     width: 70px;
                     height: 100px;
                 }
@@ -79,11 +78,10 @@
                     position: absolute;
                     top: 0;
                 }
-                /* Clase para la desaparición interesante (grande, borrosa, y vuela hacia arriba) */
+                /* Clase para cuando desaparece */
                 .ghost-hand-container.vanish {
                     opacity: 0 !important;
-                    /* Mantenemos el translateX actual del JS y agregamos el efecto visual */
-                    filter: blur(10px) brightness(2);
+                    filter: blur(8px) brightness(1.5);
                 }
 
                 @media (max-width: 600px) { body { padding: 10px; } header h1 { font-size: 1.3em; } .progress-bar-container { margin: 30px 0; flex-wrap: wrap; justify-content: center; gap: 10px; } .progress-bar-container::before { display: none; } .step { flex-basis: 30%; margin-bottom: 15px; } .card-grid { grid-template-columns: 1fr; } }
@@ -174,7 +172,9 @@ revisar cubiertas</p>
                                 <svg width="60" height="70" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M5 6l-2 2 2 2" stroke-width="1" opacity="0.7"/>
                                     <path d="M3 8h6" stroke-width="1" opacity="0.7"/>
-                                    <path d="M11 14V5a1.5 1.5 0 0 1 3 0v9"/> <path d="M14 14V7a1.5 1.5 0 0 1 3 0v7a3 3 0 0 1-3 3h-3a4 4 0 0 1-4-4v-1a1.5 1.5 0 0 1 1.5-1.5h2.5V14"/> </svg>
+                                    <path d="M11 14V5a1.5 1.5 0 0 1 3 0v9"/> 
+                                    <path d="M14 14V7a1.5 1.5 0 0 1 3 0v7a3 3 0 0 1-3 3h-3a4 4 0 0 1-4-4v-1a1.5 1.5 0 0 1 1.5-1.5h2.5V14"/> 
+                                </svg>
                             </div>
 
                             <div class="table-responsive" id="tableContainer">
@@ -184,10 +184,10 @@ revisar cubiertas</p>
                                     </thead>
                                     <tbody>
                 <tr>
-                    <td>carburador</td>
+                    <td>cilindro</td>
                     <td class="text-right">1.0</td>
-                    <td class="text-right">$1,500.00</td>
-                    <td class="text-right">$1,500.00</td>
+                    <td class="text-right">$56,000.00</td>
+                    <td class="text-right">$56,000.00</td>
                 </tr>
                 
                 <tr>
@@ -219,9 +219,9 @@ revisar cubiertas</p>
                 </tr>
                 </tbody>
                                     <tfoot>
-                                        <tr class="subtotal-row"><td colspan="3" class="text-right">TOTAL REPARACIÓN</td><td class="text-right">$37,142.00</td></tr>
+                                        <tr class="subtotal-row"><td colspan="3" class="text-right">TOTAL REPARACIÓN</td><td class="text-right">$91,642.00</td></tr>
                                         <tr class="pago-row"><td colspan="3" class="text-right">SEÑAS / PAGOS</td><td class="text-right">-$0.00</td></tr>
-                                        <tr class="total-row"><td colspan="3" class="text-right">SALDO A PAGAR</td><td class="text-right">$37,142.00</td></tr>
+                                        <tr class="total-row"><td colspan="3" class="text-right">SALDO A PAGAR</td><td class="text-right">$91,642.00</td></tr>
                                     </tfoot>
                                 </table>
                             </div>
@@ -232,96 +232,70 @@ revisar cubiertas</p>
             </div>
 
             <script>
-                document.addEventListener("DOMContentLoaded", function() {
-                    const table = document.getElementById('tableContainer');
-                    const ghostHand = document.getElementById('ghostHand');
-                    
-                    let autoAnimating = true;
-                    let animationId = null;
-                    let startTime = null;
+                // Esperamos a que la página cargue COMPLETAMENTE (imágenes, fuentes, todo)
+                window.addEventListener("load", function() {
+                    // Le damos medio segundo extra al celular para que acomode bien la tabla
+                    setTimeout(function() {
+                        const table = document.getElementById('tableContainer');
+                        const ghostHand = document.getElementById('ghostHand');
+                        
+                        let autoAnimating = true;
+                        let animationId = null;
+                        let startTime = null;
 
-                    // Comprobar si la tabla requiere scroll y es pantalla chica
-                    if (table.scrollWidth > table.clientWidth && window.innerWidth <= 600) {
-                        ghostHand.style.display = 'flex'; // Mostramos el fantasma
-                        
-                        // Obtenemos el ancho de la mano para calcular límites exactos
-                        const handWidth = 70;
-                        const containerWidth = table.clientWidth;
-                        
-                        // Función de animación sincronizada pixel-perfecta
-                        function autoScrollDemo(timestamp) {
-                            if (!autoAnimating) return;
-                            if (!startTime) startTime = timestamp;
+                        // Comprobación segura: ¿La tabla realmente se sale de la pantalla?
+                        if (table.scrollWidth > table.clientWidth) {
+                            ghostHand.style.display = 'flex';
                             
-                            let elapsed = timestamp - startTime;
+                            const containerWidth = table.clientWidth;
                             
-                            // Movimiento cíclico suave (bucle infinito usando Math.sin)
-                            // Genera un progreso entre 0 y 1 cada 3 segundos
-                            let progress = (Math.sin(elapsed / 500 - Math.PI/2) + 1) / 2; 
-                            
-                            // Cantidad máxima de píxeles reales a mover
-                            let maxTableScroll = table.scrollWidth - containerWidth;
-                            
-                            // --- LA MAGIA DE LA SINCRONIZACIÓN ---
-                            // 1. La PC mueve la tabla...
-                            let currentTableScroll = progress * maxTableScroll;
-                            table.scrollLeft = currentTableScroll;
-                            
-                            // 2. ...Y movemos la mano EXACTAMENTE la misma cantidad de píxeles
-                            // La posición base es 'right: 20px' (CSS). 
-                            // Traducimos el scroll de la tabla en un 'translateX' negativo
-                            // para que la mano acompañe el movimiento de las celdas pixel por pixel.
-                            ghostHand.style.transform = `translateY(-50%) translateX(${-currentTableScroll}px)`;
+                            function autoScrollDemo(timestamp) {
+                                if (!autoAnimating) return;
+                                if (!startTime) startTime = timestamp;
+                                
+                                let elapsed = timestamp - startTime;
+                                
+                                // Genera un movimiento suave que va de 0 a 1 y vuelve a 0
+                                let progress = (Math.sin(elapsed / 500 - Math.PI/2) + 1) / 2; 
+                                
+                                // Cuántos píxeles en total sobra de tabla
+                                let maxTableScroll = table.scrollWidth - containerWidth;
+                                
+                                // Movimiento sincronizado PC/Mano
+                                let currentTableScroll = progress * maxTableScroll;
+                                table.scrollLeft = currentTableScroll;
+                                
+                                // La mano se ancla visualmente a la celda acompañando el movimiento
+                                ghostHand.style.transform = `translateY(-50%) translateX(${-currentTableScroll}px)`;
+                                
+                                animationId = requestAnimationFrame(autoScrollDemo);
+                            }
                             
                             animationId = requestAnimationFrame(autoScrollDemo);
-                        }
-                        
-                        // Arrancar la animación
-                        animationId = requestAnimationFrame(autoScrollDemo);
 
-                        // --- SENSORES DE MOVIMIENTO REAL PARA DESAPARECER ---
-                        let lastScrollPosition = table.scrollLeft;
-
-                        function checkUserMovement() {
-                            if (autoAnimating) {
-                                // Comparamos si la posición actual es diferente a la que debería tener por la animación.
-                                // La animación automática siempre cambia table.scrollLeft.
-                                // Si el usuario mueve el dedo, lastScrollPosition no coincidirá.
-                                let currentScroll = table.scrollLeft;
-                                if (Math.abs(currentScroll - lastScrollPosition) < 0.1) {
-                                    // Sigue la animación automática, actualizamos marcador
-                                    lastScrollPosition = currentScroll;
-                                    requestAnimationFrame(checkUserMovement);
-                                } else {
-                                    // ¡EL USUARIO MOVIÓ LA TABLA!
-                                    stopAndVanishAnimation();
+                            // Función de desaparición épica
+                            function stopAndVanishAnimation() {
+                                if (autoAnimating) {
+                                    autoAnimating = false;
+                                    cancelAnimationFrame(animationId);
+                                    
+                                    let currentTransform = getComputedStyle(ghostHand).transform;
+                                    
+                                    ghostHand.classList.add('vanish');
+                                    ghostHand.style.transform = `${currentTransform} scale(1.5) translateY(-60px)`;
+                                    
+                                    setTimeout(function() {
+                                        ghostHand.style.display = 'none';
+                                    }, 600);
                                 }
                             }
-                        }
-                        
-                        // Iniciamos el chequeo de movimiento
-                        requestAnimationFrame(checkUserMovement);
 
-                        function stopAndVanishAnimation() {
-                            if (autoAnimating) {
-                                autoAnimating = false;
-                                cancelAnimationFrame(animationId);
-                                
-                                // Capturamos el translateX actual para mantenerlo durante la desaparición
-                                let currentTransform = getComputedStyle(ghostHand).transform;
-                                
-                                // Agregamos el efecto visual (grande, borrosa, brightness)
-                                // y forzamos el vanish interesante manteniendo el translation
-                                ghostHand.classList.add('vanish');
-                                ghostHand.style.transform = `${currentTransform} scale(2) translateY(-100px)`;
-                                
-                                // La borramos después de 600ms
-                                setTimeout(function() {
-                                    ghostHand.style.display = 'none';
-                                }, 600);
-                            }
+                            // EL NUEVO SENSOR: Solo desaparece si detecta el gesto REAL de deslizar
+                            table.addEventListener('touchmove', stopAndVanishAnimation, { passive: true });
+                            table.addEventListener('mousemove', stopAndVanishAnimation, { passive: true });
+                            table.addEventListener('wheel', stopAndVanishAnimation, { passive: true });
                         }
-                    }
+                    }, 500); // <-- Los 500ms de gracia para que cargue
                 });
             </script>
         </body>
