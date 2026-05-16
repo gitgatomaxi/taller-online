@@ -4,6 +4,7 @@
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+            
             <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
             <meta http-equiv="Pragma" content="no-cache">
             <meta http-equiv="Expires" content="0">
@@ -33,7 +34,9 @@
                 .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 20px; }
                 .card { background-color: var(--card-bg-color); padding: 20px; border-radius: 10px; border: 1px solid var(--border-color); box-shadow: 0 2px 8px rgba(0,0,0,0.25); }
                 .card h2 { margin-top: 0; color: var(--primary-color); border-bottom: 1px solid var(--border-color); padding-bottom: 10px; font-size: 1.2em; font-weight: 700; }
-                .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+                
+                /* Estilos de la tabla */
+                .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; position: relative; }
                 .budget-table { width: 100%; min-width: 400px; border-collapse: collapse; margin-top: 10px; }
                 .budget-table th, .budget-table td { padding: 10px 12px; border-bottom: 1px solid var(--border-color); text-align: left; font-size: 0.95em; }
                 .budget-table th { background-color: #333333; font-weight: 700; }
@@ -41,45 +44,61 @@
                 .pago-row td { color: var(--red-color); font-weight: bold; }
                 .total-row td { font-size: 1.2em; font-weight: bold; border-top: 2px solid var(--green-color); padding-top: 15px; color: var(--green-color); }
                 .text-right { text-align: right; }
-                .status-cancelado { background-color: var(--red-color); color: white; text-align: center; padding: 20px; border-radius: 8px; margin: 40px 0; }
-                footer { text-align: center; margin-top: 40px; font-size: 0.85em; color: var(--text-color-secondary); border-top: 1px solid var(--border-color); padding-top: 20px; }
                 
-                /* Estilos Scroll-Hint */
-                .scroll-hint { text-align: center; color: var(--text-color-secondary); margin-bottom: 10px; font-size: 0.9em; display: none; padding: 10px; background-color: rgba(255,255,255,0.05); border-radius: 8px; transition: opacity 0.5s ease; }
-                .scroll-hint .hand-icon { font-size: 2em; display: inline-block; animation: swipeHand 1.5s ease-in-out infinite; }
-                .scroll-hint .text { margin-top: 5px; font-weight: 400; }
-                @keyframes swipeHand { 0%, 100% { transform: translateX(15px); opacity: 0.5; } 50% { transform: translateX(-15px); opacity: 1; } }
-                
-                @media (max-width: 600px) { body { padding: 10px; } header h1 { font-size: 1.3em; } .progress-bar-container { margin: 30px 0; flex-wrap: wrap; justify-content: center; gap: 10px; } .progress-bar-container::before { display: none; } .step { flex-basis: 30%; margin-bottom: 15px; } .card-grid { grid-template-columns: 1fr; } .scroll-hint { display: block; } }
+                /* NUEVO: ESTILOS DE LA ANIMACIÓN FANTASMA (GHOST DRAG) */
+                .table-wrapper { position: relative; }
+                .ghost-hand-container {
+                    position: absolute;
+                    top: 50px; /* Sobre la tabla */
+                    left: 0;
+                    z-index: 20;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    pointer-events: none; /* TRUCO DE MAGIA: Los toques traspasan la mano directo a la tabla */
+                    transition: opacity 0.6s ease, transform 0.6s ease, filter 0.6s ease;
+                    display: none; /* Controlado por JS */
+                }
+                .ghost-hand-container svg { filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.6)); }
+                .ghost-text {
+                    background: var(--primary-color);
+                    color: white;
+                    padding: 5px 12px;
+                    border-radius: 15px;
+                    font-size: 0.8em;
+                    margin-top: 8px;
+                    font-weight: bold;
+                    box-shadow: 0px 4px 6px rgba(0,0,0,0.4);
+                    white-space: nowrap;
+                }
+                /* Clase para la desaparición interesante (se hace grande, borrosa y vuela hacia arriba) */
+                .ghost-hand-container.vanish {
+                    opacity: 0;
+                    transform: scale(2) translateY(-40px) rotate(10deg) !important;
+                    filter: blur(8px);
+                }
+
+                @media (max-width: 600px) { body { padding: 10px; } header h1 { font-size: 1.3em; } .progress-bar-container { margin: 30px 0; flex-wrap: wrap; justify-content: center; gap: 10px; } .progress-bar-container::before { display: none; } .step { flex-basis: 30%; margin-bottom: 15px; } .card-grid { grid-template-columns: 1fr; } }
             </style>
+
             <script>
                 var cleanUrl = window.location.href.split('?')[0];
-                
-                // 1. Forzar recarga al abrir desde un link viejo o historial
                 if (!sessionStorage.getItem("fresh_load")) {
                     sessionStorage.setItem("fresh_load", "true");
                     window.location.replace(cleanUrl + "?t=" + new Date().getTime());
                 } else {
                     sessionStorage.removeItem("fresh_load");
                 }
-
-                // 2. Forzar recarga si el navegador restaura la pestaña (botón Atrás)
                 window.addEventListener("pageshow", function(event) {
-                    if (event.persisted) {
-                        window.location.replace(cleanUrl + "?t=" + new Date().getTime());
-                    }
+                    if (event.persisted) { window.location.replace(cleanUrl + "?t=" + new Date().getTime()); }
                 });
-
-                // 3. Forzar recarga si la pestaña quedó abierta minimizada más de 3 minutos
                 var loadTime = new Date().getTime();
                 document.addEventListener("visibilitychange", function() {
                     if (document.visibilityState === 'visible') {
-                        if (new Date().getTime() - loadTime > 180000) { // 180000 ms = 3 minutos
-                            window.location.replace(cleanUrl + "?t=" + new Date().getTime());
-                        }
+                        if (new Date().getTime() - loadTime > 180000) { window.location.replace(cleanUrl + "?t=" + new Date().getTime()); }
                     }
                 });
-        </script>        
+            </script>
         </head>
         <body>
             <div class="container">
@@ -140,17 +159,22 @@ revisar cubiertas</p>
                     <section class="card">
                         <h2>Presupuesto Detallado</h2>
                         
-                        <div class="scroll-hint" id="scrollHint">
-                            <div class="hand-icon">👉</div>
-                            <div class="text">Desplace para ver detalle completo</div>
-                        </div>
+                        <div class="table-wrapper">
+                            
+                            <div class="ghost-hand-container" id="ghostHand">
+                                <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M11 14V8a2 2 0 0 1 4 0v6"/>
+                                    <path d="M15 14V6a2 2 0 0 1 4 0v8a4 4 0 0 1-4 4h-3a5 5 0 0 1-5-5v-2a2 2 0 0 1 2-2h2"/>
+                                </svg>
+                                <div class="ghost-text">Deslice para ver detalle</div>
+                            </div>
 
-                        <div class="table-responsive" id="tableContainer">
-                            <table class="budget-table">
-                                <thead>
-                                    <tr><th>Descripción</th><th class="text-right">Cantidad</th><th class="text-right">P. Unitario</th><th class="text-right">Subtotal</th></tr>
-                                </thead>
-                                <tbody>
+                            <div class="table-responsive" id="tableContainer">
+                                <table class="budget-table">
+                                    <thead>
+                                        <tr><th>Descripción</th><th class="text-right">Cantidad</th><th class="text-right">P. Unitario</th><th class="text-right">Subtotal</th></tr>
+                                    </thead>
+                                    <tbody>
                 <tr>
                     <td>Nuevo Item</td>
                     <td class="text-right">1.0</td>
@@ -166,46 +190,33 @@ revisar cubiertas</p>
                 </tr>
                 
                 <tr>
-                    <td>Nuevo Item</td>
+                    <td>dgf</td>
                     <td class="text-right">1.0</td>
-                    <td class="text-right">$500.00</td>
-                    <td class="text-right">$500.00</td>
+                    <td class="text-right">$478.00</td>
+                    <td class="text-right">$478.00</td>
                 </tr>
                 
                 <tr>
-                    <td>Nuevo Item</td>
-                    <td class="text-right">1.0</td>
-                    <td class="text-right">$78,888.00</td>
-                    <td class="text-right">$78,888.00</td>
-                </tr>
-                
-                <tr>
-                    <td>Nuevo Item</td>
-                    <td class="text-right">1.0</td>
-                    <td class="text-right">$45,654.00</td>
-                    <td class="text-right">$45,654.00</td>
-                </tr>
-                
-                <tr>
-                    <td>Nuevo Item</td>
-                    <td class="text-right">1.0</td>
-                    <td class="text-right">$456,546.00</td>
-                    <td class="text-right">$456,546.00</td>
-                </tr>
-                
-                <tr>
-                    <td>Nuevo Item</td>
+                    <td>sdgdfg</td>
                     <td class="text-right">1.0</td>
                     <td class="text-right">$0.00</td>
                     <td class="text-right">$0.00</td>
+                </tr>
+                
+                <tr>
+                    <td>sdf</td>
+                    <td class="text-right">1.0</td>
+                    <td class="text-right">$34,664.00</td>
+                    <td class="text-right">$34,664.00</td>
                 </tr>
                 </tbody>
-                                <tfoot>
-                                    <tr class="subtotal-row"><td colspan="3" class="text-right">TOTAL REPARACIÓN</td><td class="text-right">$582,088.00</td></tr>
-                                    <tr class="pago-row"><td colspan="3" class="text-right">SEÑAS / PAGOS</td><td class="text-right">-$0.00</td></tr>
-                                    <tr class="total-row"><td colspan="3" class="text-right">SALDO A PAGAR</td><td class="text-right">$582,088.00</td></tr>
-                                </tfoot>
-                            </table>
+                                    <tfoot>
+                                        <tr class="subtotal-row"><td colspan="3" class="text-right">TOTAL REPARACIÓN</td><td class="text-right">$35,642.00</td></tr>
+                                        <tr class="pago-row"><td colspan="3" class="text-right">SEÑAS / PAGOS</td><td class="text-right">-$0.00</td></tr>
+                                        <tr class="total-row"><td colspan="3" class="text-right">SALDO A PAGAR</td><td class="text-right">$35,642.00</td></tr>
+                                    </tfoot>
+                                </table>
+                            </div>
                         </div>
                     </section>
                 </main>
@@ -214,15 +225,66 @@ revisar cubiertas</p>
 
             <script>
                 document.addEventListener("DOMContentLoaded", function() {
-                    var tableContainer = document.getElementById('tableContainer');
-                    var scrollHint = document.getElementById('scrollHint');
-                    if(tableContainer && scrollHint) {
-                        tableContainer.addEventListener('scroll', function() {
-                            if(tableContainer.scrollLeft > 5) {
-                                scrollHint.style.opacity = '0';
-                                setTimeout(function() { scrollHint.style.display = 'none'; }, 500);
+                    const table = document.getElementById('tableContainer');
+                    const ghostHand = document.getElementById('ghostHand');
+                    
+                    let autoAnimating = true;
+                    let animationId = null;
+                    let startTime = null;
+
+                    // Comprobar si la tabla requiere scroll
+                    if (table.scrollWidth > table.clientWidth && window.innerWidth <= 600) {
+                        ghostHand.style.display = 'flex'; // Mostramos el fantasma
+                        
+                        // Lógica para que la computadora mueva la tabla y la mano
+                        function autoScrollDemo(timestamp) {
+                            if (!autoAnimating) return;
+                            if (!startTime) startTime = timestamp;
+                            
+                            let elapsed = timestamp - startTime;
+                            
+                            // Movimiento suave y oscilatorio (bucle infinito usando Math.sin)
+                            // Calcula un progreso entre 0 y 1 cada 3 segundos
+                            let progress = (Math.sin(elapsed / 500 - Math.PI/2) + 1) / 2; 
+                            
+                            // Cantidad máxima de píxeles a mover para la demostración
+                            let maxScroll = Math.min(100, table.scrollWidth - table.clientWidth);
+                            
+                            // La PC mueve la tabla...
+                            table.scrollLeft = progress * maxScroll;
+                            
+                            // ...Y movemos la mano en sincronía
+                            // Empezamos en el centro de la pantalla y la movemos hacia la izquierda
+                            let startOffset = table.clientWidth / 2 + 30;
+                            ghostHand.style.transform = `translateX(${startOffset - (progress * maxScroll)}px)`;
+                            
+                            animationId = requestAnimationFrame(autoScrollDemo);
+                        }
+                        
+                        // Arrancar la animación
+                        animationId = requestAnimationFrame(autoScrollDemo);
+
+                        // Lógica de desaparición interesante
+                        function stopAnimation() {
+                            if (autoAnimating) {
+                                autoAnimating = false;
+                                cancelAnimationFrame(animationId);
+                                
+                                // Agregamos la clase que hace el efecto visual (grande, borrosa, y vuela)
+                                ghostHand.classList.add('vanish');
+                                
+                                // La borramos del código después de 600ms para que no ocupe memoria
+                                setTimeout(function() {
+                                    ghostHand.style.display = 'none';
+                                }, 600);
                             }
-                        }, { passive: true });
+                        }
+
+                        // Si el cliente toca la tabla (mousedown en PC, touchstart en Celu), 
+                        // o intenta usar la rueda del ratón, la animación se detiene y la mano desaparece.
+                        table.addEventListener('touchstart', stopAnimation, { passive: true });
+                        table.addEventListener('mousedown', stopAnimation, { passive: true });
+                        table.addEventListener('wheel', stopAnimation, { passive: true });
                     }
                 });
             </script>
