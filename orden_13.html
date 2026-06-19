@@ -3,168 +3,103 @@
         <html lang="es">
         <head>
             <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+            
+            <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+            <meta http-equiv="Pragma" content="no-cache">
+            <meta http-equiv="Expires" content="0">
             <title>Seguimiento de Orden #13</title>
             <link rel="preconnect" href="https://fonts.googleapis.com">
             <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
             <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
             <style>
                 :root {
-                    --bg-color: #121212;
-                    --card-bg-color: #252526;
-                    --border-color: #3d3d3d;
-                    --text-color: #f0f0f0;
-                    --text-color-secondary: #a0a0a0;
-                    --primary-color: #007acc;
-                    --green-color: #37cc1d;
-                    --red-color: #dc3545;
+                    --bg-color: #121212; --card-bg-color: #252526; --border-color: #3d3d3d;
+                    --text-color: #f0f0f0; --text-color-secondary: #a0a0a0; --primary-color: #007acc;
+                    --green-color: #37cc1d; --red-color: #dc3545;
                 }
-                body {
-                    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-                    background-color: var(--bg-color);
-                    color: var(--text-color);
-                    margin: 0;
-                    padding: 20px;
-                    line-height: 1.6;
-                    font-weight: 300;
-                }
-                .container {
-                    max-width: 900px;
-                    margin: 0 auto;
-                }
-                header {
-                    text-align: center;
-                    margin-bottom: 40px;
-                    border-bottom: 1px solid var(--border-color);
-                    padding-bottom: 20px;
-                }
-                header h1 {
-                    margin: 0;
-                    color: var(--text-color);
-                    font-weight: 700;
-                }
-                header p {
-                    margin: 5px 0 0;
-                    font-size: 1.2em;
-                    color: var(--text-color-secondary);
-                }
-                header p strong {
-                    color: var(--primary-color);
-                    font-weight: 400;
-                }
-                .progress-bar-container {
-                    display: flex;
-                    justify-content: space-between;
-                    position: relative;
-                    margin: 60px 0;
-                }
-                .progress-bar-container::before {
-                    content: '';
+                body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 15px; line-height: 1.6; font-weight: 300; overflow-x: hidden; }
+                .container { max-width: 900px; margin: 0 auto; }
+                header { text-align: center; margin-bottom: 30px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px; }
+                header h1 { margin: 0; font-size: 1.5em; color: var(--text-color); font-weight: 700; }
+                header p { margin: 5px 0 0; font-size: 1.1em; color: var(--text-color-secondary); }
+                header p strong { color: var(--primary-color); font-weight: 400; }
+                .progress-bar-container { display: flex; justify-content: space-between; position: relative; margin: 40px 0 50px 0; }
+                .progress-bar-container::before { content: ''; position: absolute; top: 15px; left: 10%; right: 10%; height: 4px; background-color: var(--border-color); z-index: 1; }
+                .step { display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; z-index: 2; flex-basis: 20%; }
+                .circle { width: 30px; height: 30px; border-radius: 50%; background-color: var(--border-color); border: 4px solid var(--bg-color); transition: background-color 0.4s ease, box-shadow 0.4s ease; }
+                .label { margin-top: 10px; font-size: 0.85em; font-weight: 400; color: var(--text-color-secondary); }
+                .step.completed .circle { background-color: var(--green-color); box-shadow: 0 0 15px 1px rgba(55, 204, 29, 0.7); }
+                .step.completed .label { color: var(--text-color); }
+                .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 20px; }
+                .card { background-color: var(--card-bg-color); padding: 20px; border-radius: 10px; border: 1px solid var(--border-color); box-shadow: 0 2px 8px rgba(0,0,0,0.25); }
+                .card h2 { margin-top: 0; color: var(--primary-color); border-bottom: 1px solid var(--border-color); padding-bottom: 10px; font-size: 1.2em; font-weight: 700; }
+                
+                /* Estilos de la tabla */
+                .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; position: relative; }
+                .budget-table { width: 100%; min-width: 500px; border-collapse: collapse; margin-top: 10px; }
+                .budget-table th, .budget-table td { padding: 10px 12px; border-bottom: 1px solid var(--border-color); text-align: left; font-size: 0.95em; }
+                .budget-table th { background-color: #333333; font-weight: 700; }
+                .subtotal-row td { padding-top: 15px; font-weight: bold; }
+                .pago-row td { color: var(--red-color); font-weight: bold; }
+                .total-row td { font-size: 1.2em; font-weight: bold; border-top: 2px solid var(--green-color); padding-top: 15px; color: var(--green-color); }
+                .text-right { text-align: right; }
+                
+                /* ANIMACIÓN FANTASMA CORREGIDA */
+                .table-wrapper { position: relative; }
+                .ghost-hand-container {
                     position: absolute;
-                    top: 15px;
-                    left: 10%;
-                    right: 10%;
-                    height: 4px;
-                    background-color: var(--border-color);
-                    z-index: 1;
-                }
-                .step {
-                    display: flex;
+                    top: 50%;
+                    right: 20px; 
+                    transform: translateY(-50%); 
+                    z-index: 20;
+                    display: none; /* Controlado por JS */
                     flex-direction: column;
                     align-items: center;
-                    text-align: center;
-                    position: relative;
-                    z-index: 2;
-                    flex-basis: 20%;
+                    pointer-events: none; /* Magia: no bloquea los toques */
+                    transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.6s ease;
+                    width: 80px;
                 }
-                .circle {
-                    width: 30px;
-                    height: 30px;
-                    border-radius: 50%;
-                    background-color: var(--border-color);
-                    border: 4px solid var(--bg-color);
-                    transition: background-color 0.4s ease, box-shadow 0.4s ease;
+                .ghost-hand-container svg {
+                    filter: drop-shadow(0px 6px 8px rgba(0,0,0,0.7));
+                    margin-top: 5px;
                 }
-                .label {
-                    margin-top: 10px;
-                    font-size: 0.9em;
-                    font-weight: 400;
-                    color: var(--text-color-secondary);
-                }
-                .step.completed .circle {
-                    background-color: var(--green-color);
-                    box-shadow: 0 0 15px 1px rgba(55, 204, 29, 0.7);
-                }
-                .step.completed .label {
-                    color: var(--text-color);
-                }
-                .card-grid {
-                    display: grid;
-                    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-                    gap: 20px;
-                    margin-bottom: 20px;
-                }
-                .card {
-                    background-color: var(--card-bg-color);
-                    padding: 25px;
-                    border-radius: 15px;
-                    border: 1px solid var(--border-color);
-                    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
-                    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-                }
-                .card:hover {
-                    transform: translateY(-5px);
-                    box-shadow: 0 6px 16px rgba(0,0,0,0.3);
-                }
-                .card h2 {
-                    margin-top: 0;
-                    color: var(--primary-color);
-                    border-bottom: 1px solid var(--border-color);
-                    padding-bottom: 10px;
-                    font-size: 1.4em;
-                    font-weight: 700;
-                }
-                .budget-table {
-                    width: 100%;
-                    border-collapse: collapse;
-                    margin-top: 10px;
-                }
-                .budget-table th, .budget-table td {
-                    padding: 12px 15px;
-                    border-bottom: 1px solid var(--border-color);
-                    text-align: left;
-                }
-                .budget-table th { background-color: #333333; font-weight: 700; }
-                .total-row td {
-                    font-size: 1.3em;
-                    font-weight: bold;
-                    border-top: 2px solid var(--green-color);
-                    padding-top: 15px;
-                }
-                .text-right { text-align: right; }
-                .status-cancelado {
-                    background-color: var(--red-color);
+                .ghost-text {
+                    background: var(--primary-color);
                     color: white;
-                    text-align: center;
-                    padding: 20px;
-                    border-radius: 8px;
-                    margin: 40px 0;
+                    padding: 5px 12px;
+                    border-radius: 12px;
+                    font-size: 0.8em;
+                    font-weight: bold;
+                    box-shadow: 0px 4px 6px rgba(0,0,0,0.4);
+                    white-space: nowrap;
                 }
-                footer {
-                    text-align: center;
-                    margin-top: 40px;
-                    font-size: 0.9em;
-                    color: var(--text-color-secondary);
-                    border-top: 1px solid var(--border-color);
-                    padding-top: 20px;
+                .ghost-hand-container.vanish {
+                    opacity: 0 !important;
+                    filter: blur(8px) brightness(1.5);
                 }
-                 @media (max-width: 768px) {
-                    body { padding: 10px; }
-                    .progress-bar-container { margin: 40px 0; }
-                    .label { font-size: 0.8em; }
-                    .card-grid { grid-template-columns: 1fr; }
-                 }
+
+                @media (max-width: 600px) { body { padding: 10px; } header h1 { font-size: 1.3em; } .progress-bar-container { margin: 30px 0; flex-wrap: wrap; justify-content: center; gap: 10px; } .progress-bar-container::before { display: none; } .step { flex-basis: 30%; margin-bottom: 15px; } .card-grid { grid-template-columns: 1fr; } }
             </style>
+
+            <script>
+                var cleanUrl = window.location.href.split('?')[0];
+                if (!sessionStorage.getItem("fresh_load")) {
+                    sessionStorage.setItem("fresh_load", "true");
+                    window.location.replace(cleanUrl + "?t=" + new Date().getTime());
+                } else {
+                    sessionStorage.removeItem("fresh_load");
+                }
+                window.addEventListener("pageshow", function(event) {
+                    if (event.persisted) { window.location.replace(cleanUrl + "?t=" + new Date().getTime()); }
+                });
+                var loadTime = new Date().getTime();
+                document.addEventListener("visibilitychange", function() {
+                    if (document.visibilityState === 'visible') {
+                        if (new Date().getTime() - loadTime > 180000) { window.location.replace(cleanUrl + "?t=" + new Date().getTime()); }
+                    }
+                });
+            </script>
         </head>
         <body>
             <div class="container">
@@ -172,10 +107,8 @@
                     <h1>Seguimiento de Orden de Reparación</h1>
                     <p>Orden Nro: 13 - Estado: <strong>Ingresado</strong></p>
                 </header>
-                
                 <main>
-                    <section>
-                        <div class="progress-bar-container">
+                    <section><div class="progress-bar-container">
                 <div class="step completed">
                     <div class="circle"></div>
                     <div class="label">Ingresado</div>
@@ -200,57 +133,149 @@
                     <div class="circle"></div>
                     <div class="label">Listo</div>
                 </div>
-                </div>
-                    </section>
-                    
+                </div></section>
                     <section class="card-grid">
                         <div class="card">
                             <h2>Cliente</h2>
-                            <p><strong>Nombre:</strong> correccion sd</p>
-                            <p><strong>DNI:</strong> 234324</p>
-                            <p><strong>Teléfono:</strong> 2615108122</p>
+                            <p><strong>Nombre:</strong> daniel caramelli</p>
+                            <p><strong>DNI:</strong> 12321324</p>
+                            <p><strong>Teléfono:</strong> 1162082807</p>
                         </div>
                         <div class="card">
                             <h2>Vehículo</h2>
-                            <p><strong>Tipo:</strong> Bicimoto 48cc/80cc</p>
-                            <p><strong>Marca/Modelo:</strong>  </p>
-                            <p><strong>Patente:</strong> 23</p>
+                            <p><strong>Tipo:</strong> Bicicleta MTB Rodado 29</p>
+                            <p><strong>Marca/Modelo:</strong> bm 100</p>
                         </div>
                     </section>
-
                     <section class="card">
                         <h2>Problema Reportado</h2>
-                        <p>asdsa</p>
+                        <p style="white-space: pre-wrap;">caja rota</p>
                     </section>
-                    
                     <section class="card">
                         <h2>Presupuesto Detallado</h2>
-                        <table class="budget-table">
-                            <thead>
-                                <tr>
-                                    <th>Descripción</th>
-                                    <th class="text-right">Cantidad</th>
-                                    <th class="text-right">P. Unitario</th>
-                                    <th class="text-right">Subtotal</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr><td colspan="4" style="text-align:center;">No hay items en el presupuesto.</td></tr>
-                            </tbody>
-                            <tfoot>
-                                <tr class="total-row">
-                                    <td colspan="3"><strong>TOTAL</strong></td>
-                                    <td class="text-right"><strong>$0.00</strong></td>
-                                </tr>
-                            </tfoot>
-                        </table>
+                        
+                        <div class="table-wrapper">
+                            
+                            <div class="ghost-hand-container" id="ghostHand">
+                                <div class="ghost-text">Deslice tabla</div>
+                                <svg width="70" height="70" viewBox="0 0 24 24" fill="rgba(0, 122, 204, 0.15)" stroke="var(--primary-color)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M5 6l-2 2 2 2" stroke-width="1" opacity="0.8"/>
+                                    <path d="M3 8h6" stroke-width="1" opacity="0.8"/>
+                                    <path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2-2v0a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v9.5L4.7 13a2 2 0 0 0-2.8.2v0a2 2 0 0 0 .2 2.8l6.3 6.3a4 4 0 0 0 2.8 1.2h4.5a5 5 0 0 0 5-5v-6.5a2 2 0 0 0-2-2z"/>
+                                </svg>
+                            </div>
+
+                            <div class="table-responsive" id="tableContainer">
+                                <table class="budget-table">
+                                    <thead>
+                                        <tr><th>Item</th><th>Descripción</th><th class="text-right">Cantidad</th><th class="text-right">P. Unitario</th><th class="text-right">Subtotal</th></tr>
+                                    </thead>
+                                    <tbody><tr><td colspan="4" style="text-align:center;">No hay items en el presupuesto.</td></tr></tbody>
+                                    <tfoot>
+                                        <tr class="subtotal-row"><td colspan="4" class="text-right">TOTAL REPARACIÓN</td><td class="text-right">$0.00</td></tr>
+                                        <tr class="pago-row"><td colspan="4" class="text-right">SEÑAS / PAGOS</td><td class="text-right">-$0.00</td></tr>
+                                        <tr class="total-row"><td colspan="4" class="text-right">SALDO A PAGAR</td><td class="text-right">$0.00</td></tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
                     </section>
                 </main>
-                
-                <footer>
-                    <p>Gracias por confiar en nuestros servicios. Este es un reporte automático de seguimiento.</p>
-                </footer>
+                <footer><p>Gracias por confiar en nuestros servicios. Este es un reporte automático de seguimiento.</p></footer>
             </div>
+
+            <script>
+                window.addEventListener("load", function() {
+                    setTimeout(function() {
+                        const table = document.getElementById('tableContainer');
+                        const ghostHand = document.getElementById('ghostHand');
+                        
+                        let autoAnimating = true;
+                        let animationId = null;
+                        let startTime = null;
+
+                        if (table.scrollWidth > table.clientWidth && window.innerWidth <= 600) {
+                            ghostHand.style.display = 'flex';
+                            
+                            const containerWidth = table.clientWidth;
+                            const handWidth = 80; // Ancho del contenedor de la mano
+                            
+                            // LÍMITE ESTRICTO: La demo nunca debe scrollear más allá de lo visible en pantalla
+                            let maxTableScroll = table.scrollWidth - containerWidth;
+                            let maxDemoScroll = Math.min(maxTableScroll, containerWidth - handWidth - 10);
+                            
+                            // Prevención por si la pantalla es excesivamente chica
+                            if (maxDemoScroll <= 0) maxDemoScroll = maxTableScroll;
+
+                            function autoScrollDemo(timestamp) {
+                                if (!autoAnimating) return;
+                                if (!startTime) startTime = timestamp;
+                                
+                                let elapsed = timestamp - startTime;
+                                
+                                // Bucle suave
+                                let progress = (Math.sin(elapsed / 500 - Math.PI/2) + 1) / 2; 
+                                
+                                // Usamos el límite de demo para que nunca se pierda por la izquierda
+                                let currentScroll = progress * maxDemoScroll;
+                                table.scrollLeft = currentScroll;
+                                
+                                ghostHand.style.transform = `translateY(-50%) translateX(${-currentScroll}px)`;
+                                
+                                animationId = requestAnimationFrame(autoScrollDemo);
+                            }
+                            
+                            animationId = requestAnimationFrame(autoScrollDemo);
+
+                            function stopAndVanishAnimation() {
+                                if (autoAnimating) {
+                                    autoAnimating = false;
+                                    cancelAnimationFrame(animationId);
+                                    
+                                    let currentTransform = getComputedStyle(ghostHand).transform;
+                                    ghostHand.classList.add('vanish');
+                                    ghostHand.style.transform = `${currentTransform} scale(1.5) translateY(-60px)`;
+                                    
+                                    setTimeout(function() { ghostHand.style.display = 'none'; }, 600);
+                                }
+                            }
+
+                            // SENSOR DE DESLIZAMIENTO GENUINO
+                            let touchStartX = 0;
+                            table.addEventListener('touchstart', function(e) {
+                                touchStartX = e.touches[0].clientX;
+                            }, { passive: true });
+
+                            table.addEventListener('touchmove', function(e) {
+                                if (!autoAnimating) return;
+                                // Comparamos la posición inicial del dedo con la actual
+                                let diffX = Math.abs(e.touches[0].clientX - touchStartX);
+                                
+                                // Solo desaparece si el dedo se movió más de 15 píxeles (deslizar)
+                                if (diffX > 15) {
+                                    stopAndVanishAnimation();
+                                }
+                            }, { passive: true });
+                            
+                            // Soporte para arrastre con mouse en PC
+                            let isMouseDown = false;
+                            table.addEventListener('mousedown', () => isMouseDown = true, { passive: true });
+                            window.addEventListener('mouseup', () => isMouseDown = false, { passive: true });
+                            table.addEventListener('mousemove', function() {
+                                if (autoAnimating && isMouseDown) {
+                                    stopAndVanishAnimation();
+                                }
+                            }, { passive: true });
+                            
+                            table.addEventListener('wheel', function(e) {
+                                if (autoAnimating && Math.abs(e.deltaX) > 10) {
+                                    stopAndVanishAnimation();
+                                }
+                            }, { passive: true });
+                        }
+                    }, 500); 
+                });
+            </script>
         </body>
         </html>
         
