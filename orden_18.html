@@ -262,6 +262,16 @@
                                 }
                             }
 
+                            // 👇 NUEVO: TEMPORIZADOR DE GRACIA (1.5 segundos) 👇
+                            let vanishTimerIniciado = false;
+                            function iniciarSecuenciaVanish() {
+                                if (!vanishTimerIniciado && autoAnimating) {
+                                    vanishTimerIniciado = true;
+                                    // Le da 1.5 segundos extra de movimiento antes de evaporarse
+                                    setTimeout(stopAndVanishAnimation, 1500); 
+                                }
+                            }
+
                             // SENSOR DE DESLIZAMIENTO GENUINO
                             let touchStartX = 0;
                             table.addEventListener('touchstart', function(e) {
@@ -270,12 +280,10 @@
 
                             table.addEventListener('touchmove', function(e) {
                                 if (!autoAnimating) return;
-                                // Comparamos la posición inicial del dedo con la actual
                                 let diffX = Math.abs(e.touches[0].clientX - touchStartX);
                                 
-                                // Solo desaparece si el dedo se movió más de 15 píxeles (deslizar)
                                 if (diffX > 15) {
-                                    stopAndVanishAnimation();
+                                    iniciarSecuenciaVanish(); // Dispara el temporizador en vez de matarla de golpe
                                 }
                             }, { passive: true });
                             
@@ -285,13 +293,13 @@
                             window.addEventListener('mouseup', () => isMouseDown = false, { passive: true });
                             table.addEventListener('mousemove', function() {
                                 if (autoAnimating && isMouseDown) {
-                                    stopAndVanishAnimation();
+                                    iniciarSecuenciaVanish();
                                 }
                             }, { passive: true });
                             
                             table.addEventListener('wheel', function(e) {
                                 if (autoAnimating && Math.abs(e.deltaX) > 10) {
-                                    stopAndVanishAnimation();
+                                    iniciarSecuenciaVanish();
                                 }
                             }, { passive: true });
                         }
